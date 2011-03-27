@@ -6,13 +6,14 @@
 class QLabel;
 class QLineEdit;
 class QPushButton;
+class QApplication;
 
 class ImageWindow : public QDialog
 {
         Q_OBJECT
 
         public:
-                ImageWindow(QWidget *parent = 0);
+                ImageWindow(QApplication* app, QWidget *parent = 0);
 
         signals:
 		void canceled();

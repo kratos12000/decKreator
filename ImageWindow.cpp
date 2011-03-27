@@ -7,10 +7,10 @@
 #include <QByteArray>
 #include <KStandardDirs>
 #include <zlib.h>
-#include "imagewindow.h"
+#include "ImageWindow.h"
 #define CHUNK 16384
 
-ImageWindow::ImageWindow(QWidget *parent) : QDialog(parent)
+ImageWindow::ImageWindow(QApplication* app, QWidget *parent) : QDialog(parent)
 {
 	
         nameLabel = new QLabel(tr("Name:"));
@@ -37,6 +37,8 @@ ImageWindow::ImageWindow(QWidget *parent) : QDialog(parent)
                 this, SLOT(applyButtonPressed()));
         connect(cancelButton, SIGNAL(clicked()),
                this, SLOT(cancelButtonPressed()));
+
+	connect(this, SIGNAL(canceled()), app, SLOT(quit()));
 
         //Layout
         QHBoxLayout *line1Layout = new QHBoxLayout;
