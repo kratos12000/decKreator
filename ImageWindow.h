@@ -1,14 +1,14 @@
 #ifndef IMAGEWINDOW_H
 #define IMAGEWINDOW_H
 
-#include <QDialog>
+#include <KDialog>
 
 class QLabel;
 class QLineEdit;
 class QPushButton;
 class QApplication;
 
-class ImageWindow : public QDialog
+class ImageWindow : public KDialog
 {
         Q_OBJECT
 
@@ -19,7 +19,7 @@ class ImageWindow : public QDialog
 		void canceled();
 
 	public slots:
-		void applyButtonPressed();
+		void okButtonPressed();
 		void cancelButtonPressed();
 
         private slots:
@@ -27,13 +27,12 @@ class ImageWindow : public QDialog
                 void enableBrowseButton(const QString &text);
 
         private:
-                QLabel *nameLabel;
-                QLineEdit *nameLineEdit;
-                QLabel *browseLabel;
-                QLineEdit *browseLineEdit;
-                QPushButton *browseButton;
-                QPushButton *okButton;
-		QPushButton *cancelButton;
+		QApplication* m_app;
+                QLabel *m_nameLabel;
+                QLineEdit *m_nameLineEdit;
+                QLabel *m_browseLabel;
+                QLineEdit *m_browseLineEdit;
+                QPushButton *m_browseButton;
 };
 
 #endif
