@@ -4,7 +4,7 @@
 #include <zlib.h>
 
 #include <QApplication>
-#include <QMessageBox>
+#include <KMessageBox>
 #include <QDomDocument>
 #include <QDomElement>
 #include <QDomAttr>
@@ -24,27 +24,33 @@ ImageWindow::ImageWindow(QApplication* app, QWidget *parent) : KDialog(parent)
 	m_browser = new BrowseWidget(this);
 
 	setCaption("decKreator");
-	setButtons(KDialog::Ok | KDialog::Cancel);
+	setButtons(KDialog::Apply | KDialog::Cancel);
+	enableButton(KDialog::Apply, false);
         
 	this->setMainWidget(m_browser);
-        connect(this, SIGNAL(okClicked()), this, SLOT(okButtonPressed()));
+        connect(this, SIGNAL(applyClicked()), this, SLOT(applyButtonPressed()));
         connect(this, SIGNAL(cancelClicked()), this, SLOT(cancelButtonPressed()));
+	connect(m_browser, SIGNAL(nameChanged()), this, SLOT(enableApply()));
 }
 
-void ImageWindow::okButtonPressed()
+void ImageWindow::enableApply(){
+	enableButton(KDialog::Apply, m_browser->validInputs());
+}
+
+void ImageWindow::applyButtonPressed()
 {
  	QString template_path;
 	template_path =	KStandardDirs::locate( "data" , "deckreator/custom-deck.svg");
         QFile file(template_path);
            if (!file.open(QIODevice::ReadOnly)){
-	       QMessageBox::warning(this, "ERROR", QString("Could not open file custom-deck.svg.  Looked in ") + template_path);
+	       KMessageBox::error(this, QString("Could not open file custom-deck.svg.  Looked in ") + template_path, "ERROR");
                return;
 	   }
         
 	QDomDocument doc("Custom Deck");
            if (!doc.setContent(&file)) {
                file.close();
-	       QMessageBox::warning(this, "ERROR:", "Could not parse custom-deck.svg file");
+	       KMessageBox::error(this, "Could not parse custom-deck.svg file", "ERROR");
                return;
            }
         file.close();
@@ -52,11 +58,11 @@ void ImageWindow::okButtonPressed()
 	KUrl url = m_browser->url();
         QString path = url.path();
 	if (path.isEmpty()){
-		QMessageBox::warning(this, "ERROR:", "No image path selected.");
+		KMessageBox::error(this, "No image path selected.", "ERROR");
 		return;
 	}
 	if (!QFile::exists(path)){
-		QMessageBox::warning(this, "ERROR:", path + " is not a valid file path.");
+		KMessageBox::error(this, path + " is not a valid file path.", "ERROR");
 		return;
 	}
         QString name = m_browser->name(); //Put the name typed by the user into this varable
@@ -70,7 +76,7 @@ void ImageWindow::okButtonPressed()
 
 	QFile index_file(deck_path + "index.desktop"); //Create a new index file for the custom deck.
 	if (!index_file.open(QIODevice::WriteOnly | QFile::Truncate)){
-		QMessageBox::warning(this, "ERROR:", QString("Could not open file ") + deck_path + "index.desktop for writing.");
+		KMessageBox::error(this, QString("Could not open file ") + deck_path + "index.desktop for writing.", "ERROR");
 		return;
 	}
 	
@@ -92,7 +98,7 @@ void ImageWindow::okButtonPressed()
 
 	QFile preview_file(path);
 	if (!preview_file.open(QIODevice::ReadOnly)){
-		QMessageBox::warning(this, "ERROR:", QString("Could not open file ") + path);
+		KMessageBox::error(this, QString("Could not open file ") + path, "ERROR");
 		return;
 	}
 
@@ -104,7 +110,7 @@ void ImageWindow::okButtonPressed()
 	gzFile zipfile = gzopen((deck_path + "custom-deck.svgz").toLatin1(), "w");
 	gzputs(zipfile, doc.toString().toLatin1()); 
 	gzclose(zipfile);
-	QMessageBox::information(this, "Success!", "decKreator has successfully created a custom theme for your KPatience enjoyment.");
+	KMessageBox::information(this, "Success!", "decKreator has successfully created a custom theme for your KPatience enjoyment.");
 }
 
 void ImageWindow::cancelButtonPressed()

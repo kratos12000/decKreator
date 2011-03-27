@@ -21,6 +21,10 @@ BrowseWidget::BrowseWidget(QWidget *parent) : QWidget(parent)
 	QFormLayout* layout = new QFormLayout(this);
 	layout->addRow(m_nameLabel, m_nameLineEdit);
 	layout->addRow(m_fileLabel, m_requester);
+	
+	connect(m_nameLineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotNameChanged()));
+	connect(m_requester, SIGNAL(textChanged(const QString&)), this, SLOT(slotNameChanged()));
+
 	setLayout(layout);
 }
 
@@ -32,4 +36,15 @@ KUrl BrowseWidget::url() const
 QString BrowseWidget::name() const
 {
 	return m_nameLineEdit->text();
+}
+
+bool BrowseWidget::validInputs() const
+{
+	if (!m_nameLineEdit->text().isEmpty() && !m_requester->text().isEmpty())
+		return true;
+	return false;
+}
+
+void BrowseWidget::slotNameChanged(){
+	emit nameChanged();
 }

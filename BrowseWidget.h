@@ -16,12 +16,19 @@ class BrowseWidget : public QWidget
                 BrowseWidget(QWidget *parent = 0);
 		KUrl url() const;
 		QString name() const;
+		bool validInputs() const;
+
+	signals:
+		void nameChanged();
 
         private:
                 QLabel *m_nameLabel;
                 QLabel *m_fileLabel;
                 QLineEdit *m_nameLineEdit;
 		KUrlRequester* m_requester;
+
+	private slots:
+		void slotNameChanged();
 };
 
 #endif //__BROWSEWIDGET_H

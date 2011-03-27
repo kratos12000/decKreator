@@ -23,8 +23,9 @@ class ImageWindow : public KDialog
 		void canceled();
 
 	public slots:
-		void okButtonPressed();
+		void applyButtonPressed();
 		void cancelButtonPressed();
+		void enableApply();
 
         private:
 		QApplication* m_app;
