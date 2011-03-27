@@ -7,6 +7,10 @@ class QLabel;
 class QLineEdit;
 class QPushButton;
 class QApplication;
+class KUrl;
+class KUrlRequester;
+
+class BrowseWidget;
 
 class ImageWindow : public KDialog
 {
@@ -22,17 +26,9 @@ class ImageWindow : public KDialog
 		void okButtonPressed();
 		void cancelButtonPressed();
 
-        private slots:
-                void getPath();
-                void enableBrowseButton(const QString &text);
-
         private:
 		QApplication* m_app;
-                QLabel *m_nameLabel;
-                QLineEdit *m_nameLineEdit;
-                QLabel *m_browseLabel;
-                QLineEdit *m_browseLineEdit;
-                QPushButton *m_browseButton;
+		BrowseWidget* m_browser;
 };
 
 #endif

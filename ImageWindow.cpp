@@ -1,12 +1,9 @@
 #include "ImageWindow.h"
+#include "BrowseWidget.h"
 
 #include <zlib.h>
 
 #include <QApplication>
-#include <QLabel>
-#include <QFormLayout>
-#include <QPushButton>
-#include <QLineEdit>
 #include <QMessageBox>
 #include <QDomDocument>
 #include <QDomElement>
@@ -17,59 +14,21 @@
 #include <QFileDialog>
 
 #include <KStandardDirs>
-
+#include <KUrl>
 
 #define CHUNK 16384
 
 ImageWindow::ImageWindow(QApplication* app, QWidget *parent) : KDialog(parent)
 {
 	m_app = app;
+	m_browser = new BrowseWidget(this);
+
 	setCaption("decKreator");
-	setButtons(KDialog::Ok | KDialog::Cancel | KDialog::User1);
-	setButtonText(KDialog::User1, "Browse");
-	enableButton(KDialog::User1, false);
-	setDefaultButton(KDialog::User1);
-
-        m_nameLabel = new QLabel(tr("Name:"));
-        m_nameLineEdit = new QLineEdit;
-        m_nameLabel->setBuddy(m_nameLineEdit);
-
-        m_browseLabel = new QLabel( tr("Image File:") );
-        m_browseLineEdit = new QLineEdit;
-        m_browseLabel->setBuddy(m_browseLineEdit);
-
-        connect(m_nameLineEdit, SIGNAL(textChanged(const QString &)),
-                this, SLOT(enableBrowseButton(const QString &)));
-
-
-        connect(this, SIGNAL(okClicked()), this, SLOT(okButtonPressed()));
-
-        connect(this, SIGNAL(cancelClicked()), this, SLOT(cancelButtonPressed()));
+	setButtons(KDialog::Ok | KDialog::Cancel);
         
-	connect(this, SIGNAL(user1Clicked()), this, SLOT(getPath()));
-
-        //Layout
-	QFormLayout *formLayout = new QFormLayout;
-        formLayout->addRow(m_nameLabel, m_nameLineEdit);
-        formLayout->addRow(m_browseLabel, m_browseLineEdit);
-        setLayout(formLayout);
-}
-
-void ImageWindow::enableBrowseButton(const QString &text)
-{
-	enableButton(KDialog::User1, !text.isEmpty());
-}
-
-void ImageWindow::getPath()
-{
-	QString path;
-
-	path = QFileDialog::getOpenFileName(
-		this,
-		"Choose an image file to open",
-		QString::null,
-		QString::null);
-	m_browseLineEdit->setText(path);
+	this->setMainWidget(m_browser);
+        connect(this, SIGNAL(okClicked()), this, SLOT(okButtonPressed()));
+        connect(this, SIGNAL(cancelClicked()), this, SLOT(cancelButtonPressed()));
 }
 
 void ImageWindow::okButtonPressed()
@@ -90,7 +49,8 @@ void ImageWindow::okButtonPressed()
            }
         file.close();
 
-        QString path = m_browseLineEdit->text();
+	KUrl url = m_browser->url();
+        QString path = url.path();
 	if (path.isEmpty()){
 		QMessageBox::warning(this, "ERROR:", "No image path selected.");
 		return;
@@ -99,8 +59,7 @@ void ImageWindow::okButtonPressed()
 		QMessageBox::warning(this, "ERROR:", path + " is not a valid file path.");
 		return;
 	}
-
-        QString name = m_nameLineEdit->text(); //Put the name typed by the user into this varable
+        QString name = m_browser->name(); //Put the name typed by the user into this varable
         QDomNodeList nodes = doc.elementsByTagName("image");
         QDomElement back;
         back = nodes.at(0).toElement();
