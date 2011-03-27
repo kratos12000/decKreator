@@ -4,16 +4,17 @@
 #include <QFormLayout>
 #include <QLineEdit>
 
+#include <KLocale>
 #include <KUrl>
 #include <KUrlRequester>
 
 BrowseWidget::BrowseWidget(QWidget *parent) : QWidget(parent)
 {
-	m_nameLabel = new QLabel(tr("Name:"));
+	m_nameLabel = new QLabel(i18n("Name:"));
         m_nameLineEdit = new QLineEdit;
         m_nameLabel->setBuddy(m_nameLineEdit);
 
-	m_fileLabel = new QLabel(tr("File:"));
+	m_fileLabel = new QLabel(i18n("File:"));
 	m_requester = new KUrlRequester(this);
 	m_fileLabel->setBuddy(m_requester);
 
