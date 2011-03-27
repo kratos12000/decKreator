@@ -1,7 +1,7 @@
 #include "ImageWindow.h"
 #include "BrowseWidget.h"
 
-#include <zlib.h>
+#include <KFilterDev>
 
 #include <QApplication>
 #include <KMessageBox>
@@ -104,12 +104,16 @@ void ImageWindow::applyButtonPressed()
 
 	preview_file.copy(deck_path + image_base);
 
-	
 
-	QFile svg_file("custom_deck.svg");
-	gzFile zipfile = gzopen((deck_path + "custom-deck.svgz").toLatin1(), "w");
-	gzputs(zipfile, doc.toString().toLatin1()); 
-	gzclose(zipfile);
+	QString filename = deck_path + "custom-deck.svgz";	
+	KFilterDev* zipfile = static_cast<KFilterDev*>(KFilterDev::deviceForFile(filename, "application/x-gzip"));
+	if (!zipfile){
+		KMessageBox::error(this, QString("Could not find compression filter"), "ERROR");
+	}
+	zipfile->setOrigFileName(filename.toLatin1());
+	zipfile->open(QIODevice::WriteOnly);
+	zipfile->write(doc.toString().toLatin1(), doc.toString().size()); 
+	zipfile->close();
 	KMessageBox::information(this, "Success!", "decKreator has successfully created a custom theme for your KPatience enjoyment.");
 }
 
