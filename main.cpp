@@ -1,9 +1,10 @@
-#include "MainWindow.h"
+#include "ImageWindow.h"
 #include <QApplication>
+#include <QWidget>
 
 int main (int argc, char* argv[]){
 	QApplication app(argc, argv);
-	MainWindow win;
+	ImageWindow win(&app);
 	win.show();
 	app.exec();
 }
