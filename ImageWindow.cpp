@@ -1,3 +1,5 @@
+#include <QDebug>
+
 #include "ImageWindow.h"
 #include "BrowseWidget.h"
 
@@ -15,6 +17,11 @@
 
 #include <KStandardDirs>
 #include <KUrl>
+#include <KJob>
+#include <kio/jobuidelegate.h>
+#include <kio/scheduler.h>
+#include <kio/jobclasses.h>
+#include <kio/filejob.h>
 
 #define CHUNK 16384
 
@@ -41,19 +48,43 @@ void ImageWindow::applyButtonPressed()
 {
  	QString template_path;
 	template_path =	KStandardDirs::locate( "data" , "deckreator/custom-deck.svg");
-        QFile file(template_path);
+
+/*        QFile file(template_path);
            if (!file.open(QIODevice::ReadOnly)){
 	       KMessageBox::error(this, QString("Could not open file custom-deck.svg.  Looked in ") + template_path, "ERROR");
                return;
 	   }
-        
+ */      
+//	KIO::Job * job = KIO::get(KUrl(template_path));
+	qDebug() << "Template Path: " << template_path;
+	KIO::Job * job = KIO::open(KUrl(template_path), QIODevice::ReadOnly);
+	connect(job, SIGNAL( open(KIO::Job *)), this, SLOT(slotOpen(KIO::Job*)));
+	connect(job, SIGNAL( result(KJob*)), this, SLOT(slotResult(KJob*)));
+}
+
+
+void ImageWindow::slotOpen(KIO::Job* job)
+{
+	KIO::FileJob* fjob = static_cast<KIO::FileJob*>(job);
+	fjob->read(fjob->size());
+	connect( job, SIGNAL( data(KIO::Job* , const QByteArray) ),
+         this, SLOT( slotData( KIO::Job*, const QByteArray& ) ) ); //from api.kde.org
+}
+
+void ImageWindow::slotResult(KJob* job)
+{
+	if ( job->error() )
+			static_cast<KIO::Job*>(job)->ui()->showErrorMessage();
+}
+
+void ImageWindow::slotData(KIO::Job* job, const QByteArray& file_contents)
+{
+
 	QDomDocument doc("Custom Deck");
-           if (!doc.setContent(&file)) {
-               file.close();
-	       KMessageBox::error(this, "Could not parse custom-deck.svg file", "ERROR");
-               return;
-           }
-        file.close();
+        if (!doc.setContent(file_contents)) {
+		KMessageBox::error(this, "Could not parse custom-deck.svg file", "ERROR");
+        	return;
+        }
 
 	KUrl url = m_browser->url();
         QString path = url.path();

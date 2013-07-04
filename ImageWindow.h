@@ -3,12 +3,11 @@
 
 #include <KDialog>
 
-class QLabel;
-class QLineEdit;
-class QPushButton;
 class QApplication;
-class KUrl;
-class KUrlRequester;
+class KJob;
+namespace KIO {
+	class Job;
+};
 
 class BrowseWidget;
 
@@ -26,6 +25,9 @@ class ImageWindow : public KDialog
 		void applyButtonPressed();
 		void cancelButtonPressed();
 		void enableApply();
+		void slotResult(KJob*);
+		void slotOpen(KIO::Job*);
+		void slotData(KIO::Job*, const QByteArray&);
 
         private:
 		QApplication* m_app;
